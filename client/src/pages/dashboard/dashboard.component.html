@@ -1,0 +1,149 @@
+<div class="dashboard-container surface-ground px-4 py-5 md:px-6 lg:px-8">
+    <div class="text-900 font-medium text-xl mb-3">Quản lý giao dịch</div>
+
+    <!-- Header Admin logout, update profile-->
+    <div class="header-admin">  
+        <div class="header-admin-left">
+            <div class="header-admin-left-item">
+                <p-avatar [shape]="'circle'" [size]="'xlarge'" [image]="'/assets/images/avatar.png'" />
+                </div>
+            <div class="header-admin-left-item">
+                <p-avatar [shape]="'circle'" [size]="'xlarge'" [image]="'/assets/images/avatar.png'" />
+            </div>
+            <div class="header-admin-left-item">
+                <p-avatar [shape]="'circle'" [size]="'xlarge'" [image]="'/assets/images/avatar.png'" />
+            </div>
+        </div>
+        <div class="header-admin-right">
+            <div class="header-admin-right-item">
+                <p-button label="Cập nhật thông tin" icon="pi pi-user" (onClick)="updateProfile()"/>
+            </div>
+            <div class="header-admin-right-item">
+                <p-button label="Đăng xuất" icon="pi pi-sign-out" (onClick)="logout()"/>
+            </div>
+        </div>
+        <!-- Số dư tài khoản -->
+    </div>
+
+    <!-- Bộ lọc giao dịch theo loại giao dịch-->
+    <div class="surface-card p-4 shadow-2 border-round filter-card">
+        <div class="filter-header">
+            <div class="filter-title">Bộ lọc giao dịch theo loại giao dịch</div>
+            <div class="filter-actions">
+                <p-button label="Tạo giao dịch mới" icon="pi pi-plus" styleClass="p-button-success" (onClick)="openCreateTransactionDialog()"></p-button>
+            </div>
+        </div>
+        <div class="grid">
+            <div class="col-12 md:col-4 mb-2">
+                <label class="label-filter">Loại giao dịch</label>
+                <p-dropdown
+                    [options]="[{label: 'Tất cả', value: 0}, {label: 'Gửi tiền', value: 1}, {label: 'Rút tiền', value: 2}]"
+                    styleClass="w-full" placeholder="Chọn loại giao dịch"></p-dropdown>
+            </div>
+        </div>
+    </div>
+    <!-- Bảng giao dịch -->
+    <div class="surface-card p-4 shadow-2 border-round transaction-table">
+        <div class="table-header">
+            <div class="header-title">Danh sách giao dịch gần đây</div>
+            <div class="header-search">
+                <label class="label-filter mb-2">Tìm kiếm theo tên chủ tài khoản</label>
+                <p-floatlabel variant="on">
+                    <input pInputText id="on_label" [(ngModel)]="transactionByAccountName" autocomplete="off" />
+                    <label for="on_label">Tài khoản</label>
+                </p-floatlabel>
+            </div>
+        </div>
+
+        <!-- Bảng dữ liệu -->
+        <p-table [value]="[
+                {id: '001', accId: 'ACC001', transMoney: 5000000, transType: 1, dateOfTrans: '2025-03-30'},
+                {id: '002', accId: 'ACC002', transMoney: 3000000, transType: 2, dateOfTrans: '2025-03-29'},
+                {id: '003', accId: 'ACC001', transMoney: 2500000, transType: 1, dateOfTrans: '2025-03-28'},
+                {id: '004', accId: 'ACC003', transMoney: 8000000, transType: 2, dateOfTrans: '2025-03-27'},
+                {id: '005', accId: 'ACC002', transMoney: 1000000, transType: 1, dateOfTrans: '2025-03-26'}
+            ]" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]" styleClass="p-datatable-sm"
+            [rowHover]="true" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Hiển thị {first} đến {last} trong tổng số {totalRecords} giao dịch">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+                    <th pSortableColumn="accId">Tài khoản <p-sortIcon field="accId"></p-sortIcon></th>
+                    <th pSortableColumn="transMoney">Số tiền <p-sortIcon field="transMoney"></p-sortIcon></th>
+                    <th pSortableColumn="transType">Loại giao dịch <p-sortIcon field="transType"></p-sortIcon></th>
+                    <th pSortableColumn="dateOfTrans">Ngày giao dịch <p-sortIcon field="dateOfTrans"></p-sortIcon></th>
+                    <th>Thao tác</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-transaction>
+                <tr>
+                    <td>{{transaction.id}}</td>
+                    <td>{{transaction.accId}}</td>
+                    <td>{{transaction.transMoney | number}} VND</td>
+                    <td>
+                        <span class="transaction-type"
+                            [ngClass]="{'deposit': transaction.transType === 1, 'withdrawal': transaction.transType === 2}">
+                            {{transaction.transType === 1 ? 'Gửi tiền' : 'Rút tiền'}}
+                        </span>
+                    </td>
+                    <td>{{transaction.dateOfTrans | date:'dd/MM/yyyy'}}</td>
+                    <td>
+                        <button pButton pRipple icon="pi pi-pencil"
+                            class="p-button-rounded p-button-text p-button-sm mr-2 action-button"></button>
+                        <button pButton pRipple icon="pi pi-trash"
+                            class="p-button-rounded p-button-text p-button-sm p-button-danger action-button"></button>
+                    </td>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6" class="text-center p-4">Không tìm thấy giao dịch nào.</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<!-- Dialog tạo giao dịch mới -->
+<p-dialog header="Tạo giao dịch mới" [(visible)]="displayCreateDialog" [modal]="true" [style]="{width: '500px'}" [draggable]="false" [resizable]="false">
+    <form [formGroup]="transactionForm" (ngSubmit)="createTransaction()">
+        <div class="p-fluid">
+            <div class="field">
+                <label for="accountId" class="font-medium">Tài khoản</label>
+                <p-dropdown id="accountId" [options]="accounts" formControlName="accountId" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" placeholder="Chọn tài khoản" [showClear]="true"></p-dropdown>
+                <small *ngIf="transactionForm.get('accountId')?.invalid && transactionForm.get('accountId')?.touched" class="p-error">Vui lòng chọn tài khoản</small>
+            </div>
+            
+            <div class="field">
+                <label for="transactionType" class="font-medium">Loại giao dịch</label>
+                <p-dropdown id="transactionType" [options]="transactionTypes" formControlName="transactionType" optionLabel="label" optionValue="value" placeholder="Chọn loại giao dịch"></p-dropdown>
+                <small *ngIf="transactionForm.get('transactionType')?.invalid && transactionForm.get('transactionType')?.touched" class="p-error">Vui lòng chọn loại giao dịch</small>
+            </div>
+            
+            <div class="field">
+                <label for="amount" class="font-medium">Số tiền</label>
+                <p-inputNumber id="amount" formControlName="amount" min="0" mode="currency" currency="VND" locale="vi-VN"></p-inputNumber>
+                <small *ngIf="transactionForm.get('amount')?.invalid && transactionForm.get('amount')?.touched" class="p-error">
+                    <span *ngIf="transactionForm.get('amount')?.errors?.['required']">Vui lòng nhập số tiền</span>
+                    <span *ngIf="transactionForm.get('amount')?.errors?.['min']">Số tiền phải lớn hơn 0</span>
+                </small>
+            </div>
+            
+            <div class="field">
+                <label for="description" class="font-medium">Mô tả</label>
+                <textarea id="description" pInputTextarea formControlName="description" [rows]="3" [cols]="30" placeholder="Nhập mô tả giao dịch"></textarea>
+            </div>
+            
+            <div class="field">
+                <label for="transactionDate" class="font-medium">Ngày giao dịch</label>
+                <p-calendar id="transactionDate" formControlName="transactionDate" [showIcon]="true" [showButtonBar]="true" dateFormat="dd/mm/yy"></p-calendar>
+                <small *ngIf="transactionForm.get('transactionDate')?.invalid && transactionForm.get('transactionDate')?.touched" class="p-error">Vui lòng chọn ngày giao dịch</small>
+            </div>
+        </div>
+        
+        <div class="flex justify-content-end mt-4">
+            <p-button label="Hủy" icon="pi pi-times" styleClass="p-button-text" (onClick)="closeCreateTransactionDialog()"></p-button>
+            <p-button label="Lưu" icon="pi pi-check" type="submit" [disabled]="transactionForm.invalid"></p-button>
+        </div>
+    </form>
+</p-dialog>
