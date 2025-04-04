@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <div class="login-container">
     <div class="login-card">
         <div class="login-header">
@@ -38,8 +39,10 @@
                     <p-iftalabel>
                         <p-iconfield>
                             <p-inputicon class="pi pi-lock" />
-                            <input pInputText id="password" autocomplete="off" type="password" pInputText
-                                formControlName="password" placeholder="Nhập mật khẩu">
+                            <p-password id="password" autocomplete="off" type="password" formControlName="password"
+                                placeholder="Nhập mật khẩu" [toggleMask]="true" styleClass="w-full"
+                                [style]="{'width': '100%'}">
+                            </p-password>
                         </p-iconfield>
                         <label for="password">Mật khẩu</label>
                     </p-iftalabel>

@@ -26,6 +26,11 @@ export class AccountController {
     return this.accountService.updateBalance(id, amount);
   }
 
+  @Patch('update/:id')
+  updateAccount(@Param('id') id: string, @Body() account: Account) {
+    return this.accountService.updateAccount(id, account);
+  }
+
   @Get('email/:email')
   getAccountByEmail(@Param('email') email: string) {
     return this.accountService.getAccountByEmail(email);

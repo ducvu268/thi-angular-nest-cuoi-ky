@@ -1,0 +1,82 @@
+<p-toast></p-toast>
+<div class="profile-container">
+    <div class="profile-card">
+        <div class="profile-header">
+            <div class="logo-container">
+                <img src="images/ic_logo_starbucks.png" alt="Logo" class="logo-image">
+            </div>
+            <h1>Cập nhật hồ sơ</h1>
+            <p>Cập nhật thông tin cá nhân của bạn</p>
+        </div>
+
+        <form [formGroup]="formProfile" (ngSubmit)="updateProfile()">
+            <div class="p-fluid">
+                <!-- Email -->
+                <div class="field">
+                    <p-iftalabel>
+                        <p-iconfield>
+                            <p-inputicon class="pi pi-envelope" />
+                            <input pInputText id="email" autocomplete="off" type="text" placeholder="Nhập email"
+                                [disabled]="true" value="{{accountCurrent.email}}">
+                        </p-iconfield>
+                        <label for="email">Email</label>
+                    </p-iftalabel>
+                    <small
+                        *ngIf="formProfile.get('email').errors && formProfile.get('email').errors['required'] && isSubmitted"
+                        class="error-message">
+                        Vui lòng nhập email
+                    </small>
+                    <small
+                        *ngIf="formProfile.get('email').errors && formProfile.get('email').errors['email'] && isSubmitted"
+                        class="error-message">
+                        Vui lòng nhập đúng định dạng email
+                    </small>
+                </div>
+
+                <!-- Họ và tên -->
+                <div class="field">
+                    <p-iftalabel>
+                        <p-iconfield>
+                            <p-inputicon class="pi pi-user" />
+                            <input pInputText id="name" autocomplete="off" type="text" formControlName="name"
+                                placeholder="Nhập họ và tên">
+                        </p-iconfield>
+                        <label for="name">Họ và tên</label>
+                    </p-iftalabel>
+                    <small
+                        *ngIf="formProfile.get('name').errors && formProfile.get('name').errors['required'] && isSubmitted"
+                        class="error-message">
+                        Vui lòng nhập họ và tên
+                    </small>
+                </div>
+
+                <!-- Số điện thoại -->
+                <div class="field">
+                    <p-iftalabel>
+                        <p-iconfield>
+                            <p-inputicon class="pi pi-phone" />
+                            <input pInputText id="phone" autocomplete="off" type="text" formControlName="phone"
+                                placeholder="Nhập số điện thoại">
+                        </p-iconfield>
+                        <label for="phone">Số điện thoại</label>
+                    </p-iftalabel>
+                    <small
+                        *ngIf="formProfile.get('phone').errors && formProfile.get('phone').errors['pattern'] && isSubmitted"
+                        class="error-message">
+                        Vui lòng nhập đúng số điện thoại (10 số)
+                    </small>
+                </div>
+
+                <div class="button-container">
+                    <p-button type="submit" label="Cập nhật" styleClass="p-button-raised p-button-rounded update-button"
+                        [loading]="loading">
+                    </p-button>
+                    <p-button type="button" label="Hủy"
+                        styleClass="p-button-raised p-button-rounded p-button-outlined cancel-button"
+                        (onClick)="onBack()">
+                    </p-button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

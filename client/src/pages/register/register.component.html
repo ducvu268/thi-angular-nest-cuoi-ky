@@ -1,3 +1,21 @@
+<p-toast></p-toast>
+
+<!-- dialog register success -->
+<p-dialog header="Đăng ký tài khoản thành công" [modal]="true" [(visible)]="isRegisterSuccess"
+    [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+    <div class="register-success-container">
+        <div class="register-success-header">
+            <h1>Truy cập vào hệ thống</h1>
+        </div>
+        <div class="register-success-content">
+            <p>Bạn đã đăng ký tài khoản thành công. Vui lòng đăng nhập để truy cập vào hệ thống</p>
+        </div>
+        <div class="register-success-button">
+            <button pButton type="button" label="Đăng nhập" class="p-button-primary" (click)="goToLogin()"></button>
+        </div>
+    </div>
+</p-dialog>
+
 <div class="register-container">
     <div class="register-card">
         <div class="register-header">
@@ -51,8 +69,10 @@
                     <p-iftalabel>
                         <p-iconfield>
                             <p-inputicon class="pi pi-lock" />
-                            <input pInputText id="password1" autocomplete="off" type="password"
-                                formControlName="password" placeholder="Nhập mật khẩu">
+                            <p-password id="password" autocomplete="off" type="password" formControlName="password"
+                                placeholder="Nhập mật khẩu" [toggleMask]="true" styleClass="w-full"
+                                [style]="{'width': '100%'}">
+                            </p-password>
                         </p-iconfield>
                         <label for="password">Mật khẩu</label>
                     </p-iftalabel>
@@ -70,8 +90,11 @@
                     <p-iftalabel>
                         <p-iconfield>
                             <p-inputicon class="pi pi-lock" />
-                            <input pInputText id="password2" autocomplete="off" type="password"
-                                formControlName="passwordConfirm" placeholder="Nhập lại mật khẩu">
+                            <p-password id="passwordConfirm" autocomplete="off" type="password"
+                                formControlName="passwordConfirm" placeholder="Nhập lại mật khẩu" [toggleMask]="true"
+                                placeholder="Nhập mật khẩu" [toggleMask]="true" styleClass="w-full"
+                                [style]="{'width': '100%'}">
+                            </p-password>
                         </p-iconfield>
                         <label for="passwordConfirm">Xác nhận mật khẩu</label>
                     </p-iftalabel>
@@ -79,7 +102,6 @@
                     <small
                         *ngIf="registerForm.get('passwordConfirm').errors && registerForm.get('passwordConfirm').errors['required'] && isSubmitted"
                         class="error-message">Vui lòng nhập mật khẩu</small>
-                    <small *ngIf="passwordMismatch && isSubmitted" class="error-message">Mật khẩu không khớp</small>
                 </div>
 
                 <!-- field item -->

@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { ConfigService } from '@nestjs/config';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 const mongooseModuleFactory = MongooseModule.forRootAsync({
   imports: [ConfigModule],
@@ -18,18 +19,35 @@ const mongooseModuleFactory = MongooseModule.forRootAsync({
   inject: [ConfigService],
 });
 
+const mailerModuleFactory = MailerModule.forRootAsync({
+  imports: [ConfigModule],
+  useFactory: async (configService: ConfigService) => ({
+    transport: {
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
+      auth: {
+        user: configService.get<string>('MAIL_USER'),
+        pass: configService.get<string>('MAIL_PASS'),
+      },
+    },
+  }),
+  inject: [ConfigService],
+});
+
 @Module({
   imports: [
     mongooseModuleFactory,
+    mailerModuleFactory,
     ConfigModule.forRoot({
       envFilePath: ".env",
       isGlobal: true,
     }),
-    AccountModule, 
-    TransactionDetailsModule, 
+    AccountModule,
+    TransactionDetailsModule,
     AuthModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

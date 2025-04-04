@@ -39,10 +39,29 @@ export class AccountService {
   }
 
   async updateBalance(id: string, amount: number): Promise<Account> {
-    return this.accountModel.findByIdAndUpdate(id, { balance: amount }, { new: true });
+    return this.accountModel.findByIdAndUpdate(id, { $inc: { balance: amount } }, { new: true });
   }
 
   async getAccountByEmail(email: string): Promise<Account> {
-    return this.accountModel.findOne({ email });
+    try {
+      return this.accountModel.findOne({
+        email: { $regex: email, $options: 'i' }
+      }).exec();
+    } catch (error) {
+      throw new Error('Error getting account by email: ' + error.message);
+    }
+  }
+
+  async updateAccount(id: string, account: Account): Promise<Account> {
+    return this.accountModel.findByIdAndUpdate(id, account, { new: true }).exec();
+  }
+
+  async updatePasswordOfAccount(id: string, password: string): Promise<Account> {
+    try {
+      const hashedPassword = await this.handleHashPassword(password);
+      return this.accountModel.findByIdAndUpdate(id, { password: hashedPassword }, { new: true }).exec();
+    } catch (error) {
+      throw new Error('Error updating password of account: ' + error.message);
+    }
   }
 }

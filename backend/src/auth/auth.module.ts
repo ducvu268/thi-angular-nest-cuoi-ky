@@ -14,4 +14,4 @@ import { Account, AccountSchema } from 'src/account/schemas/account.schema';
   controllers: [AuthController],
   providers: [AuthService, AccountService],
 })
-export class AuthModule {}
+export class AuthModule { }

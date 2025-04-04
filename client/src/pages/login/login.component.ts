@@ -10,14 +10,17 @@ import { AccountService } from '../../core/services/account.service';
 import { PasswordModule } from 'primeng/password';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RippleModule } from 'primeng/ripple';
-import { message } from 'antd';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { IftaLabelModule } from 'primeng/iftalabel';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 @Component({
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss'],
+    providers: [MessageService],
     imports: [
         ReactiveFormsModule,
         InputTextModule,
@@ -30,7 +33,9 @@ import { IftaLabelModule } from 'primeng/iftalabel';
         ReactiveFormsModule,
         IconFieldModule,
         InputIconModule,
-        IftaLabelModule
+        IftaLabelModule,
+        MessageModule,
+        ToastModule
     ],
 })
 export class LoginComponent implements OnInit {
@@ -41,6 +46,7 @@ export class LoginComponent implements OnInit {
         private accountService: AccountService,
         private formBuilder: FormBuilder,
         private router: Router,
+        private messageService: MessageService
     ) { }
 
     ngOnInit(): void {
@@ -52,18 +58,18 @@ export class LoginComponent implements OnInit {
 
     login() {
         this.isSubmitted = true;
-        if (this.formLogin.valid) {
-            const email = this.formLogin.value.email;
-            const password = this.formLogin.value.password;
-            this.accountService.login(email, password).then((res) => {
-                console.log(res);
-                this.router.navigate(['/dashboard']);
-            }).catch((err) => {
-                console.log(err);
-                message.error('Tên đăng nhập hoặc mật khẩu không chính xác');
+        if (this.formLogin.invalid) return;
+        const email = this.formLogin.value.email;
+        const password = this.formLogin.value.password;
+        this.accountService.login(email, password).then((res) => {
+            localStorage.setItem('account', JSON.stringify(res));
+            this.router.navigate(['/dashboard']);
+        }).catch((err) => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Email hoặc mật khẩu không chính xác',
             });
-        } else {
-            message.error('Tên đăng nhập hoặc mật khẩu không chính xác');
-        }
+        });
     }
 }

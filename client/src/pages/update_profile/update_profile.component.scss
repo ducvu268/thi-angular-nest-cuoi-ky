@@ -1,0 +1,119 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2rem;
+}
+
+.profile-card {
+  width: 100%;
+  max-width: 600px;
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 2rem;
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+
+  h1 {
+    color: #00704A; // Starbucks green
+    margin-bottom: 0.5rem;
+    font-size: 1.75rem;
+  }
+
+  p {
+    color: #6c757d;
+    margin-bottom: 0;
+  }
+}
+
+.logo-container {
+  margin-bottom: 1.5rem;
+
+  .logo-image {
+    height: 60px;
+  }
+}
+
+.field {
+  margin-bottom: 1.5rem;
+
+  label {
+    font-weight: 500;
+    color: #495057;
+  }
+
+  .error-message {
+    color: #f44336;
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+.gender-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.gender-selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.gender-option {
+  display: flex;
+  align-items: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+  gap: 1rem;
+
+  .update-button {
+    flex: 1;
+    background-color: #00704A; // Starbucks green
+    border-color: #00704A;
+
+    &:hover {
+      background-color: #005a3b;
+      border-color: #005a3b;
+    }
+  }
+
+  .cancel-button {
+    flex: 1;
+    color: #00704A; // Starbucks green
+    border-color: #00704A;
+
+    &:hover {
+      background-color: rgba(0, 112, 74, 0.04);
+    }
+  }
+}
+
+// Responsive adjustments
+@media screen and (max-width: 576px) {
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  .button-container {
+    flex-direction: column;
+  }
+
+  .gender-selection {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}

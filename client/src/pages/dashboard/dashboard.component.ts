@@ -14,13 +14,19 @@ import { PaginatorModule } from 'primeng/paginator';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { FormsModule } from '@angular/forms';
 import { TransactionDetailsService } from '../../core/services/transaction-details.service';
-import { TransactionDetails } from '../../core/entities/transaction-details.entity';
+import { TransactionDetails, TransType } from '../../core/entities/transaction-details.entity';
 import { AvatarModule } from 'primeng/avatar';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';        
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { AccountService } from '../../core/services/account.service';
 import { Account } from '../../core/entities/account.entity';
+import { SelectModule } from 'primeng/select';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { AccountService } from '../../core/services/account.service';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
     templateUrl: './dashboard.component.html',
@@ -42,39 +48,62 @@ import { Account } from '../../core/entities/account.entity';
         FormsModule,
         AvatarModule,
         ReactiveFormsModule,
-        DialogModule
-    ]
+        DialogModule,
+        SelectModule,
+        ToastModule,
+        MessageModule,
+        ConfirmDialogModule
+    ],
+    providers: [MessageService, ConfirmationService]
 })
 export class DashboardComponent implements OnInit {
     transactionDetails: TransactionDetails[];
-    transactionByAccountName: string;
+    accountCurrent: Account;
     transactionForm: FormGroup;
     displayCreateDialog: boolean = false;
-    accounts: any[] = [];
-    transactionTypes: any[] = [];
+    isSubmitted: boolean = false;
+    selectedTransType: TransType;
+    transTypeOptions: { label: string, value: number }[];
+    TransType = TransType;
 
     constructor(
         private accountService: AccountService,
         private transactionService: TransactionDetailsService,
         private router: Router,
-        private formBuilder: FormBuilder
+        private formBuilder: FormBuilder,
+        private messageService: MessageService,
+        private confirmationService: ConfirmationService
     ) { }
 
     ngOnInit(): void {
-        this.getTransactionDetails();
-        this.getAccounts();
-        this.getTransactionTypes();
+        this.getAccountCurrentAndTransactionDetails();
+        this.selectedTransType = TransType.DEPOSIT;
+        this.transTypeOptions = Object.keys(TransType)
+            .filter(key => isNaN(Number(key)))
+            .map(key => ({
+                label: key,
+                value: TransType[key as keyof typeof TransType]
+            }));
         this.transactionForm = this.formBuilder.group({
-            accountId: [null, Validators.required],
-            transactionType: [null, Validators.required],
-            amount: [null, Validators.required],
-            description: [null, Validators.required]
+            transType: [TransType.DEPOSIT, Validators.required],
+            transMoney: [null, Validators.required],
         });
     }
 
-    getTransactionDetails() {
-        this.transactionService.findAll().then(res => {
-            this.transactionDetails = res as TransactionDetails[];
+    getTransactionDetailsByAccountId() {
+        this.transactionService.findAllByAccountId(this.accountCurrent._id).then(res => {
+            this.transactionDetails = (res as TransactionDetails[]).reverse();
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    getAccountCurrentAndTransactionDetails() {
+        const account = localStorage.getItem('account');
+        const parsedAccount = JSON.parse(account) as Account;
+        this.accountService.findById(parsedAccount._id).then(res => {
+            this.accountCurrent = res as Account;
+            this.getTransactionDetailsByAccountId();
         }).catch(err => {
             console.log(err);
         });
@@ -93,26 +122,121 @@ export class DashboardComponent implements OnInit {
     }
 
     createTransaction() {
-        console.log(this.transactionForm.value);
+        this.isSubmitted = true;
+        if (this.transactionForm.invalid) return;
+
+        if (this.transactionForm.value.transMoney <= 0) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Số tiền không hợp lệ'
+            });
+            return;
+        }
+
+        if (this.transactionForm.value.transMoney > this.accountCurrent.balance
+            && this.transactionForm.value.transType === TransType.WITHDRAW) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Lỗi',
+                detail: 'Số dư không đủ'
+            });
+            return;
+        }
+
+        if (this.transactionForm.value.transType === TransType.WITHDRAW) {
+            this.transactionService.createWithdraw(this.accountCurrent._id, this.transactionForm.value.transMoney).then(
+                res => {
+                    this.getAccountCurrentAndTransactionDetails();
+                    this.closeCreateTransactionDialog();
+                    this.transactionForm.reset();
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Thành công',
+                        detail: 'Giao dịch thành công',
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Giao dịch thất bại',
+                    });
+                });
+        } else {
+            this.transactionService.createDeposit(this.accountCurrent._id, this.transactionForm.value.transMoney).then(
+                res => {
+                    this.getAccountCurrentAndTransactionDetails();
+                    this.closeCreateTransactionDialog();
+                    this.transactionForm.reset();
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Thành công',
+                        detail: 'Giao dịch thành công'
+                    });
+                }).catch(err => {
+                    console.log(err);
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Lỗi',
+                        detail: 'Giao dịch thất bại'
+                    });
+                });
+        }
     }
 
     closeCreateTransactionDialog() {
         this.displayCreateDialog = false;
+        this.transactionForm.reset();
+        this.isSubmitted = false;
     }
 
-    getAccounts() {
-        this.accountService.findAll().then(res => {
-            this.accounts = res as Account[];
-        }).catch(err => {
-            console.log(err);
+    onTransTypeChange(event: any) {
+        console.log(event.value);
+        if (event.value === 0) {
+            this.getTransactionDetailsByAccountId();
+        } else {
+            this.transactionService.findAllByAccountId(this.accountCurrent._id).then(res => {
+                this.transactionDetails = (res as TransactionDetails[]).reverse();
+                var newList: TransactionDetails[] = [];
+                newList = this.transactionDetails.filter(transaction => transaction.transType == event.value);
+                this.transactionDetails = newList.reverse();
+            }).catch(err => {
+                console.log(err);
+            });
+        }
+    }
+
+    goToResetPassword() {
+        this.router.navigate(['/reset-password'], { queryParams: { token: this.accountCurrent._id } });
+    }
+
+    confirmDeleteTransaction(transaction: TransactionDetails) {
+        if (transaction === null || transaction === undefined) return;
+        this.confirmationService.confirm({
+            message: 'Bạn có chắc chắn muốn huỷ giao dịch này không?',
+            accept: () => {
+                this.deleteTransaction(transaction._id, transaction.transMoney);
+            }
         });
     }
 
-    getTransactionTypes() {
-        this.transactionService.findAll().then(res => {
-            this.transactionTypes = res as TransactionDetails[];
-        }).catch(err => {
-            console.log(err);
-        }); 
+    deleteTransaction(transactionId: string, transMoney: number) {
+        this.transactionService.deleteTransaction(transactionId, transMoney).then(
+            res => {
+                this.getAccountCurrentAndTransactionDetails();
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Thành công',
+                    detail: 'Giao dịch đã được xóa'
+                });
+            }).catch(err => {
+                console.log(err);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Lỗi',
+                    detail: 'Giao dịch không được xóa'
+                });
+            });
     }
 }

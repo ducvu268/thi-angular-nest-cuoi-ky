@@ -10,6 +10,34 @@ $border-radius: 8px;
 $shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 $transition: all 0.3s ease;
 
+:host ::ng-deep .transaction-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+:host ::ng-deep .transaction-dialog .p-dialog-header {
+  padding: 1.25rem 1.5rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+:host ::ng-deep .transaction-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e9ecef;
+}
+
+:host ::ng-deep .p-inputtext {
+  padding: 0.75rem;
+}
+
+.error-message {
+  font-size: 0.875rem;
+}
+
+.transaction-money {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
 .dashboard-container {
   background-color: $surface-bg;
   min-height: 100vh;
@@ -39,7 +67,7 @@ $transition: all 0.3s ease;
 
       &-item {
         transition: $transition;
-        
+
         &:hover {
           transform: translateY(-3px);
         }
@@ -49,14 +77,14 @@ $transition: all 0.3s ease;
     &-right {
       display: flex;
       gap: 1rem;
-      
+
       &-item {
         :deep(button) {
           background-color: $primary-color;
           border: none;
           border-radius: $border-radius;
           transition: $transition;
-          
+
           &:hover {
             background-color: darken($primary-color, 10%);
             box-shadow: 0 4px 8px rgba($primary-color, 0.3);
@@ -72,24 +100,24 @@ $transition: all 0.3s ease;
     border-radius: $border-radius;
     background-color: $card-bg;
     box-shadow: $shadow;
-    
+
     .filter-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1.5rem;
-      
+
       .filter-title {
         font-weight: 600;
         color: $primary-color;
         font-size: 1.1rem;
       }
-      
+
       .filter-actions {
         :deep(.p-button.p-button-success) {
           background-color: $success-color;
           border-color: $success-color;
-          
+
           &:hover {
             background-color: darken($success-color, 10%);
             border-color: darken($success-color, 10%);
@@ -98,18 +126,18 @@ $transition: all 0.3s ease;
         }
       }
     }
-    
+
     .label-filter {
       display: block;
       margin-bottom: 0.5rem;
       color: $text-secondary;
       font-size: 0.9rem;
     }
-    
+
     :deep(.p-dropdown) {
       width: 100%;
       border-radius: $border-radius;
-      
+
       &:focus {
         box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
         border-color: $primary-color;
@@ -124,18 +152,18 @@ $transition: all 0.3s ease;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 1rem;
-      
+
       .header-title {
         font-size: 1.25rem;
         font-weight: 500;
         color: #212121;
       }
-      
+
       .header-search {
         width: 250px;
       }
     }
-    
+
     .transaction-type {
       &.deposit {
         background-color: #E8F5E9;
@@ -145,7 +173,7 @@ $transition: all 0.3s ease;
         font-size: 0.75rem;
         font-weight: 500;
       }
-      
+
       &.withdrawal {
         background-color: #FFEBEE;
         color: #F44336;
@@ -155,59 +183,59 @@ $transition: all 0.3s ease;
         font-weight: 500;
       }
     }
-    
+
     .action-button {
       opacity: 0.7;
       transition: opacity 0.2s ease;
-      
+
       &:hover {
         opacity: 1;
       }
     }
-    
+
     tr:hover {
       background-color: #f5f5f5;
     }
   }
-  
+
   // Responsive styles
   @media (max-width: 768px) {
     .header-admin {
       flex-direction: column;
       align-items: flex-start;
-      
+
       &-right {
         margin-top: 1rem;
         width: 100%;
-        
+
         &-item {
           flex: 1;
-          
+
           :deep(button) {
             width: 100%;
           }
         }
       }
     }
-    
+
     .filter-header {
       flex-direction: column;
       align-items: flex-start;
-      
+
       .filter-actions {
         margin-top: 1rem;
         width: 100%;
-        
+
         button {
           width: 100%;
         }
       }
     }
-    
+
     .table-header {
       flex-direction: column;
       align-items: flex-start;
-      
+
       .header-search {
         width: 100%;
       }
@@ -223,30 +251,33 @@ $transition: all 0.3s ease;
     border-top-left-radius: $border-radius;
     border-top-right-radius: $border-radius;
     border-bottom: 1px solid #f0f0f0;
-    
+
     .p-dialog-title {
       font-weight: 600;
       color: $text-color;
     }
   }
-  
+
   .p-dialog-content {
     padding: 1.5rem;
     background-color: $card-bg;
-    
+
     .field {
       margin-bottom: 1.5rem;
-      
+
       label {
         display: block;
         margin-bottom: 0.5rem;
         color: $text-secondary;
       }
-      
-      .p-dropdown, .p-inputtext, .p-inputnumber, .p-calendar {
+
+      .p-dropdown,
+      .p-inputtext,
+      .p-inputnumber,
+      .p-calendar {
         width: 100%;
       }
-      
+
       .p-error {
         color: $danger-color;
         font-size: 0.85rem;
@@ -255,16 +286,85 @@ $transition: all 0.3s ease;
       }
     }
   }
-  
+
   .p-button {
     margin-left: 0.5rem;
-    
+
     &.p-button-text {
       color: $text-secondary;
-      
+
       &:hover {
         background-color: rgba($text-secondary, 0.1);
       }
+    }
+  }
+}
+
+.p-dialog {
+  .p-dialog-header {
+    background-color: $primary-color;
+    color: #fff;
+    font-weight: bold;
+    padding: 1rem;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+
+  .p-dialog-content {
+    padding: 1.5rem;
+    background-color: #f8f9fa;
+  }
+
+  .p-fluid {
+    .field {
+      margin-bottom: 1.5rem;
+
+      label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        display: block;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+
+        &:focus {
+          border-color: #007bff;
+          outline: none;
+          box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+      }
+    }
+  }
+
+  .error-message {
+    color: #dc3545;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+  }
+
+  .p-button {
+    background-color: #007bff;
+    border: none;
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: #0056b3;
     }
   }
 }

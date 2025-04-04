@@ -20,13 +20,20 @@ export class TransactionDetailsService {
     if (amount <= 0) {
       throw new BadRequestException('Số tiền giao dịch phải lớn hơn 0');
     }
+    const account = await this.accountService.getAccountById(accountId);
+    if (!account) {
+      throw new BadRequestException('Tài khoản không tồn tại');
+    }
+    if (account.balance < amount && type === TransactionType.WITHDRAW) {
+      throw new BadRequestException('Số dư tài khoản không đủ');
+    }
     const transactionAmount = type === TransactionType.WITHDRAW ? -amount : amount;
     await this.accountService.updateBalance(accountId, transactionAmount);
     const newTransaction = new this.transactionModel({
-      AccID: accountId,
-      TransMoney: Math.abs(amount),
-      TransType: type,
-      DateOfTrans: new Date()
+      accID: accountId,
+      transMoney: Math.abs(amount),
+      transType: type,
+      dateOfTrans: new Date()
     });
     return await newTransaction.save();
   }
@@ -40,19 +47,37 @@ export class TransactionDetailsService {
   }
 
   async getRecentTransactions(accountId: string, limit: number = 10): Promise<TransactionDetails[]> {
-    return this.transactionModel.find({ AccID: accountId })
+    return this.transactionModel.find({ accID: accountId })
       .sort({ DateOfTrans: -1 })
       .limit(limit)
       .exec();
   }
 
+  async getTransactionDetailsByAccountId(accountId: string): Promise<TransactionDetails[]> {
+    return this.transactionModel.find({ accID: accountId });
+  }
+
   async getTransactionsByDateRange(accountId: string, startDate: Date, endDate: Date): Promise<TransactionDetails[]> {
     return this.transactionModel.find({
-      AccID: accountId,
-      DateOfTrans: {
+      accID: accountId,
+      dateOfTrans: {
         $gte: startDate,
         $lte: endDate
       }
-    }).sort({ DateOfTrans: -1 }).exec();
+    }).sort({ dateOfTrans: -1 }).exec();
+  }
+
+  async deleteTransaction(transactionId: string, transMoney: number): Promise<TransactionDetails> {
+    try {
+      const transaction = await this.transactionModel.findById(transactionId).exec();
+      if (!transaction) {
+        throw new BadRequestException('Giao dịch không tồn tại');
+      }
+      const transactionAmount = parseInt(transaction.transType) === TransactionType.WITHDRAW ? transMoney : -transMoney;
+      await this.accountService.updateBalance(transaction.accID.toString(), transactionAmount);
+      return this.transactionModel.findByIdAndDelete(transactionId).exec();
+    } catch (error) {
+      throw new BadRequestException('Lỗi xóa giao dịch: ' + error);
+    }
   }
 }
